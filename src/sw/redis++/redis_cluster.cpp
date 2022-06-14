@@ -46,14 +46,14 @@ Pipeline RedisCluster::pipeline(const StringView &hash_tag, bool new_connection)
     return Pipeline(pool, new_connection);
 }
 
-Pipeline RedisCluster::pipeline(const StringView &hash_tag, Node &node, bool new_connection) {
+Pipeline* RedisCluster::pipeline(const StringView &hash_tag, Node &node, bool new_connection) {
     auto pool = _pool.fetch(hash_tag, node);
     if (new_connection) {
         // Create a new pool
         pool = std::make_shared<ConnectionPool>(pool->clone());
     }
 
-    return Pipeline(pool, new_connection);
+    return new Pipeline(pool, new_connection);
 }
 
 Transaction RedisCluster::transaction(const StringView &hash_tag, bool piped, bool new_connection) {

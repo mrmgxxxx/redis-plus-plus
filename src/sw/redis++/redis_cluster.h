@@ -63,7 +63,7 @@ public:
     Redis redis(const StringView &hash_tag, bool new_connection = true);
 
     Pipeline pipeline(const StringView &hash_tag, bool new_connection = true);
-    Pipeline pipeline(const StringView &hash_tag, Node &node, bool new_connection = true);
+    Pipeline* pipeline(const StringView &hash_tag, Node &node, bool new_connection = true);
 
     Transaction transaction(const StringView &hash_tag, bool piped = false, bool new_connection = true);
 

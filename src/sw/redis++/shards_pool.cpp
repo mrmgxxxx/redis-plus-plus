@@ -65,6 +65,12 @@ ConnectionPoolSPtr ShardsPool::fetch(const StringView &key) {
     return _fetch(slot);
 }
 
+ConnectionPoolSPtr ShardsPool::fetch(const StringView &key, Node &node) {
+    auto slot = _slot(key);
+
+    return _fetch(slot, node);
+}
+
 ConnectionPoolSPtr ShardsPool::fetch() {
     auto slot = _slot();
 
@@ -339,10 +345,32 @@ ConnectionPoolSPtr& ShardsPool::_get_pool(Slot slot) {
     return node_iter->second;
 }
 
+ConnectionPoolSPtr& ShardsPool::_get_pool(Slot slot, Node &node) {
+    auto shards_iter = _shards.lower_bound(SlotRange{slot, slot});
+    if (shards_iter == _shards.end() || slot < shards_iter->first.min) {
+        throw Error("Slot is out of range: " + std::to_string(slot));
+    }
+
+    node = shards_iter->second;
+
+    auto node_iter = _pools.find(node);
+    if (node_iter == _pools.end()) {
+        throw SlotUncoveredError(slot);
+    }
+
+    return node_iter->second;
+}
+
 ConnectionPoolSPtr ShardsPool::_fetch(Slot slot) {
     std::lock_guard<std::mutex> lock(_mutex);
 
     return _get_pool(slot);
+}
+
+ConnectionPoolSPtr ShardsPool::_fetch(Slot slot, Node &node) {
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    return _get_pool(slot, node);
 }
 
 ConnectionOptions ShardsPool::_connection_options(Slot slot) {

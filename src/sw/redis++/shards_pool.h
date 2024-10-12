@@ -57,6 +57,7 @@ public:
 
     // Fetch a connection by key.
     ConnectionPoolSPtr fetch(const StringView &key);
+    ConnectionPoolSPtr fetch(const StringView &key, Node &node);
 
     // Randomly pick a connection.
     ConnectionPoolSPtr fetch();
@@ -99,8 +100,10 @@ private:
     std::size_t _random(std::size_t min, std::size_t max) const;
 
     ConnectionPoolSPtr& _get_pool(Slot slot);
+    ConnectionPoolSPtr& _get_pool(Slot slot, Node &node);
 
     ConnectionPoolSPtr _fetch(Slot slot);
+    ConnectionPoolSPtr _fetch(Slot slot, Node &node);
 
     ConnectionOptions _connection_options(Slot slot);
 

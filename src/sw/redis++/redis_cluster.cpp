@@ -54,7 +54,7 @@ Pipeline RedisCluster::pipeline(const StringView &hash_tag, bool new_connection)
 }
 
 Pipeline* RedisCluster::pipeline(const StringView &hash_tag, Node &node, bool new_connection) {
-    auto pool = _pool.fetch(hash_tag, node);
+    auto pool = _pool->fetch(hash_tag, node);
     if (new_connection) {
         // Create a new pool
         pool = std::make_shared<ConnectionPool>(pool->clone());
